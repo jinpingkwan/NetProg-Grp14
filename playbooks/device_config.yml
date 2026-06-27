@@ -1,0 +1,21 @@
+# playbooks/device_config.yml
+- name: Device configuration tasks
+  hosts: routers
+  gather_facts: no
+  vars:
+    target_iface: GigabitEthernet2
+    ip_address: 10.10.10.1
+    prefix: 24
+    new_username: netadmin
+    new_password: Netauto123
+    banner_text: "Authorized access only"
+    iface_desc: "Configured by NetAuto"
+    route_dest: 10.0.0.0/24
+    route_via: 10.10.10.254
+  tasks:
+    - import_playbook: device_info.yml
+    - import_playbook: ip_address.yml
+    - import_playbook: interface_desc.yml
+    - import_playbook: user_account.yml
+    - import_playbook: banner.yml
+    - import_playbook: static_route.yml

@@ -1,0 +1,7 @@
+# roles/device_config/tasks/user_account.yml  — create a user
+- name: Create local user
+  cisco.ios.ios_user:
+    name: "{{ new_username }}"
+    configured_password: "{{ new_password }}"
+    privilege: 15
+    state: present

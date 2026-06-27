@@ -1,0 +1,11 @@
+
+- name: Gather device facts
+  cisco.ios.ios_facts:
+    gather_subset: all
+- name: Show key info
+  ansible.builtin.debug:
+    msg:
+      - "Hostname: {{ ansible_net_hostname }}"
+      - "Model: {{ ansible_net_model }}"
+      - "IOS version: {{ ansible_net_version }}"
+      - "Serial: {{ ansible_net_serialnum }}"

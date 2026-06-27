@@ -1,0 +1,14 @@
+# roles/device_config/tasks/ip_address.yml  — configure IP on an UNUSED interface (never Gi1)
+- name: Configure IP address
+  cisco.ios.ios_l3_interfaces:
+    config:
+      - name: "{{ target_iface }}"        # e.g. GigabitEthernet2
+        ipv4:
+          - address: "{{ ip_address }}/{{ prefix }}"   # e.g. 10.10.10.1/24
+    state: merged
+- name: Bring interface up
+  cisco.ios.ios_interfaces:
+    config:
+      - name: "{{ target_iface }}"
+        enabled: true
+    state: merged
