@@ -1,7 +1,0 @@
-# roles/device_config/tasks/interface_desc.yml  — set interface description
-- name: Set interface description
-  cisco.ios.ios_interfaces:
-    config:
-      - name: "{{ target_iface }}"
-        description: "{{ iface_desc }}"
-    state: merged
