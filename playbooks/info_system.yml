@@ -1,0 +1,17 @@
+# =============================================================================
+# playbooks/info_system.yml — Linux System Information
+# =============================================================================
+# Invoked by: netauto info system <host>
+# Required extra var: target_host (set automatically by cli/runner.py)
+#
+# Usage (direct):
+#   ansible-playbook playbooks/info_system.yml -e target_host=server1
+# =============================================================================
+---
+
+- name: Collect and display Linux system information
+  hosts: "{{ target_host }}"
+  gather_facts: true
+
+  roles:
+    - linux_sysinfo

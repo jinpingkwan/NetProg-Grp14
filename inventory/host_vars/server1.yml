@@ -3,7 +3,8 @@
 # =============================================================================
 
 # Management IP assigned by Containerlab (see netauto-lab.clab.yml)
-ansible_host: 172.20.20.21
+ansible_host: 127.0.0.1
+ansible_port: 2221
 
 # Data-plane address (set via containerlab exec in topology file)
 data_interface: eth1
