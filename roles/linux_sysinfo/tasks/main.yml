@@ -1,0 +1,71 @@
+# =============================================================================
+# roles/linux_sysinfo/tasks/main.yml — Linux System Information Collection
+# =============================================================================
+# Collects: hostname, date/time, CPU info, memory, disk, logged-in users,
+# and the top 5 processes by CPU usage, then prints a formatted report.
+# =============================================================================
+---
+
+- name: Get current date and time
+  ansible.builtin.command: date
+  register: date_result
+  changed_when: false
+
+- name: Get CPU information
+  ansible.builtin.command: lscpu
+  register: cpu_result
+  changed_when: false
+
+- name: Get memory usage
+  ansible.builtin.command: free -h
+  register: mem_result
+  changed_when: false
+
+- name: Get disk usage
+  ansible.builtin.command: df -h
+  register: disk_result
+  changed_when: false
+
+- name: Get logged-in users
+  ansible.builtin.command: who
+  register: users_result
+  changed_when: false
+
+- name: Get top 5 processes by CPU usage
+  ansible.builtin.shell: ps aux --sort=-%cpu | head -6
+  register: procs_result
+  changed_when: false
+
+- name: Build system information report
+  ansible.builtin.set_fact:
+    sysinfo_report: |
+      ============================================================
+       System Information Report — {{ inventory_hostname }}
+      ============================================================
+
+      HOSTNAME
+        {{ inventory_hostname }}
+
+      DATE / TIME
+        {{ date_result.stdout }}
+
+      CPU INFORMATION
+      {{ cpu_result.stdout }}
+
+      MEMORY USAGE
+      {{ mem_result.stdout }}
+
+      DISK USAGE
+      {{ disk_result.stdout }}
+
+      LOGGED-IN USERS
+        {{ users_result.stdout if users_result.stdout else '(no users logged in)' }}
+
+      TOP 5 PROCESSES BY CPU
+      {{ procs_result.stdout }}
+
+      ============================================================
+
+- name: Display system information report
+  ansible.builtin.debug:
+    msg: "{{ sysinfo_report.split('\n') }}"
