@@ -1,0 +1,50 @@
+# =============================================================================
+# NetAuto — Custom Linux Server Image
+# =============================================================================
+# Lightweight Alpine image with everything Ansible needs to SSH in and
+# collect the system information listed in the project proposal:
+#   hostname, date/time, CPU info, memory, disk, logged-in users, top processes
+# =============================================================================
+
+FROM alpine:3.20
+
+# Install required packages
+#   openssh      — SSH server for Ansible connectivity
+#   python3      — Ansible requires Python on managed hosts
+#   procps       — provides  ps  (for "top 5 processes by CPU")
+#   coreutils    — provides  df, date, who  (GNU versions)
+#   util-linux   — provides  lscpu  (CPU information)
+#   shadow       — provides  useradd / usermod  (for user-account playbook)
+#   sudo         — privilege escalation
+#   bash         — nicer shell for Ansible
+RUN apk add --no-cache \
+    openssh \
+    python3 \
+    procps \
+    coreutils \
+    util-linux \
+    shadow \
+    sudo \
+    bash
+
+# ── Configure SSH ────────────────────────────────────────────────────────────
+# Generate host keys
+RUN ssh-keygen -A
+
+# Allow root login via password (lab environment only!)
+RUN sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^#PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Set a root password (lab use only — "netauto")
+RUN echo "root:netauto" | chpasswd
+
+# Create a non-root user that Ansible can also use
+RUN adduser -D -s /bin/bash ansible && \
+    echo "ansible:netauto" | chpasswd && \
+    echo "ansible ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# ── Expose SSH ───────────────────────────────────────────────────────────────
+EXPOSE 22
+
+# Start sshd in the foreground
+CMD ["/usr/sbin/sshd", "-D", "-e"]

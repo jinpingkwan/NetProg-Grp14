@@ -1,0 +1,23 @@
+# =============================================================================
+# group_vars/linux_servers.yml — Shared variables for all Linux servers
+# =============================================================================
+# These variables apply to every host in the [linux_servers] group.
+# Per-host overrides (like ansible_host) live in host_vars/<hostname>.yml.
+# =============================================================================
+
+# ── Connection ───────────────────────────────────────────────────────────────
+# Standard SSH connection (not network_cli — these are regular Linux hosts).
+ansible_connection: ssh
+
+# ── Credentials ──────────────────────────────────────────────────────────────
+# User created in the Dockerfile with NOPASSWD sudo.
+ansible_user: root
+ansible_password: netauto
+
+# ── Python Interpreter ───────────────────────────────────────────────────────
+# Alpine installs Python 3 at this path; Ansible needs to know where it is.
+ansible_python_interpreter: /usr/bin/python3
+
+# ── SSH Options ──────────────────────────────────────────────────────────────
+# Lab environment — skip host key checking to avoid interactive prompts.
+ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"

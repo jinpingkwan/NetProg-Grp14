@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetAuto — Project Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f7f6;
+    --surface:#ffffff;
+    --ink:#12181f;
+    --muted:#5b6573;
+    --accent:#0e7c86;
+    --accent-dim:#dcecea;
+    --rule:#dde2e2;
+    --term-bg:#0f1620;
+    --term-text:#d7e5e4;
+    --term-prompt:#34d6c4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",sans-serif;
+    font-size:16px;
+    line-height:1.65;
+  }
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding:56px 24px 96px;
+  }
+  h1,h2,h3{
+    font-family:"IBM Plex Mono",monospace;
+    font-weight:600;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  header.doc-header{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:24px;
+    margin-bottom:32px;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13px;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin:0 0 10px;
+  }
+  h1{
+    font-size:30px;
+    margin:0 0 6px;
+    line-height:1.25;
+  }
+  .subtitle{
+    font-size:16px;
+    color:var(--muted);
+    margin:0 0 22px;
+  }
+  table.meta{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.meta td{
+    padding:4px 0;
+    vertical-align:top;
+  }
+  table.meta td.k{
+    font-family:"IBM Plex Mono",monospace;
+    color:var(--muted);
+    width:140px;
+    white-space:nowrap;
+  }
+  table.meta td.v{
+    color:var(--ink);
+  }
+  section{
+    margin:40px 0;
+  }
+  h2{
+    font-size:18px;
+    margin:0 0 16px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--rule);
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  h2 .num{
+    color:var(--accent);
+  }
+  h3{
+    font-size:14.5px;
+    margin:24px 0 10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    font-weight:500;
+  }
+  p{ margin:0 0 14px; }
+  ol, ul{ margin:0 0 14px; padding-left:22px; }
+  li{ margin-bottom:6px; }
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    margin:0 0 14px;
+  }
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+    background:var(--surface);
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:10px 14px;
+    border-bottom:1px solid var(--rule);
+  }
+  table.data th{
+    font-family:"IBM Plex Mono",monospace;
+    font-weight:500;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+    background:var(--accent-dim);
+  }
+  table.data tr:last-child td{ border-bottom:none; }
+  code{
+    font-family:"IBM Plex Mono",monospace;
+    background:var(--accent-dim);
+    color:var(--accent);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:0.92em;
+  }
+  .term{
+    background:var(--term-bg);
+    color:var(--term-text);
+    border-radius:8px;
+    padding:14px 18px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13.5px;
+    line-height:1.7;
+    margin:0 0 12px;
+    overflow-x:auto;
+    white-space:pre;
+  }
+  .term .prompt{ color:var(--term-prompt); }
+  .term-row{ margin-bottom:4px; }
+  .term-label{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    margin:0 0 6px;
+  }
+  .arch{
+    background:var(--term-bg);
+    color:var(--term-text);
+    border-radius:8px;
+    padding:20px 22px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13px;
+    line-height:1.75;
+    white-space:pre;
+    overflow-x:auto;
+    margin:0 0 14px;
+  }
+  .arch .hl{ color:var(--term-prompt); }
+  .tree{
+    background:var(--term-bg);
+    color:var(--term-text);
+    border-radius:8px;
+    padding:18px 20px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13px;
+    line-height:1.7;
+    white-space:pre;
+    overflow-x:auto;
+    margin:0 0 14px;
+  }
+  .badge{
+    display:inline-block;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;
+    color:var(--accent);
+    background:var(--accent-dim);
+    border-radius:4px;
+    padding:2px 8px;
+    margin-left:8px;
+  }
+  .placeholder{ color:var(--muted); font-style:italic; }
+  footer{
+    margin-top:48px;
+    padding-top:18px;
+    border-top:1px solid var(--rule);
+    font-size:12.5px;
+    color:var(--muted);
+    font-family:"IBM Plex Mono",monospace;
+  }
+  #print-btn{
+    position:fixed;
+    top:20px;
+    right:20px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:9px 14px;
+    cursor:pointer;
+  }
+  #print-btn:hover{ background:var(--accent); }
+  @media (max-width:640px){
+    .page{ padding:36px 16px 72px; }
+    h1{ font-size:24px; }
+    #print-btn{ position:static; display:block; margin:0 0 24px; width:fit-content; }
+  }
+  @media print{
+    #print-btn{ display:none; }
+    body{ background:#fff; }
+    .page{ padding:0; max-width:100%; }
+    section{ margin:24px 0; }
+    table.data tr, .term, .arch, .tree{ page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+<button id="print-btn" onclick="window.print()">Print / save as PDF</button>
+<div class="page">
+
+  <header class="doc-header">
+    <p class="eyebrow">Project proposal — SECR3253 Network Programming</p>
+    <h1>NetAuto</h1>
+    <p class="subtitle">Network &amp; Linux infrastructure automation toolkit</p>
+    <table class="meta">
+      <tr><td class="k">group</td><td class="v placeholder">[Insert group number]</td></tr>
+      <tr><td class="k">section(s)</td><td class="v placeholder">[Insert section(s) — group can span sections]</td></tr>
+      <tr><td class="k">members</td><td class="v placeholder">[Name 1], [Name 2], [Name 3], [Name 4], [Name 5]</td></tr>
+      <tr><td class="k">date submitted</td><td class="v">21 June 2026</td></tr>
+      <tr><td class="k">deadline</td><td class="v">09:00, 6 July 2026</td></tr>
+    </table>
+  </header>
+
+  <section>
+    <h2><span class="num">01</span> Overview</h2>
+    <p>NetAuto is a command-line automation toolkit that configures network devices and reports on Linux host status from a single tool. It satisfies the assignment's requirement to develop an automation solution using Docker, Ansible, NETCONF, or a combination of these technologies by combining all three: Ansible performs the actual configuration and data collection, Docker/Containerlab hosts a reproducible lab of simulated devices and servers, and a Typer-based CLI (<code>netauto</code>) gives the team and the grader a clean, documented entry point instead of raw <code>ansible-playbook</code> invocations.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span> Objectives</h2>
+    <p>The toolkit will:</p>
+    <ol>
+      <li>Configure an IP address on a target network device</li>
+      <li>Create a user account on a target network device</li>
+      <li>Set a banner message on a target network device</li>
+      <li>Set an interface description on a target network device</li>
+      <li>Add a static route on a target network device</li>
+      <li>Retrieve and display general device information</li>
+      <li>Automatically collect and display Linux system information: hostname, current date/time, CPU info, memory usage, disk usage, logged-in users, and the top 5 processes by CPU usage</li>
+    </ol>
+    <p>All work will be tracked through a shared GitHub repository with commits from every member, in line with the assignment's collaboration requirements.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span> Technology stack</h2>
+    <div class="table-wrap">
+      <table class="data">
+        <tr><th>Component</th><th>Tool</th><th>Purpose</th></tr>
+        <tr><td>Automation engine</td><td>Ansible</td><td>Performs all device configuration and Linux fact-gathering tasks via playbooks and roles</td></tr>
+        <tr><td>Lab environment</td><td>Docker / Containerlab</td><td>Hosts simulated network devices and Linux servers so the project runs without physical hardware</td></tr>
+        <tr><td>Device connectivity</td><td>SSH / NETCONF</td><td>Connection methods used by Ansible to reach devices, set per host in the inventory</td></tr>
+        <tr><td>CLI interface</td><td>Typer (Python)</td><td>Wraps the playbooks in a documented, validated command-line tool (<code>netauto</code>)</td></tr>
+        <tr><td>Version control</td><td>Git / GitHub</td><td>Source of truth for code; commit history serves as collaboration evidence</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span> System architecture</h2>
+    <div class="arch">GitHub repo (source code)
+        |
+        v
+  Typer CLI ("netauto")
+        |
+        v
+     Ansible (playbooks &amp; roles)
+        |
+        +----&gt; <span class="hl">Network devices</span> (Docker/Containerlab)
+        |       IP, user, banner, interface, static route, device info
+        |
+        +----&gt; <span class="hl">Linux hosts</span> (Docker/Containerlab)
+                hostname, date/time, CPU, memory, disk, users, top processes</div>
+    <p>The CLI never talks to devices directly — every <code>netauto</code> subcommand resolves to an Ansible playbook run against a named host or group defined in a shared inventory file. This keeps device-specific connection details (SSH vs. NETCONF, credentials, OS type) out of the CLI code entirely.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span> Functional requirements</h2>
+
+    <h3>5.1 Device configuration tasks (network devices)</h3>
+    <p class="term-label">Configure IP address</p>
+    <div class="term"><span class="prompt">$</span> netauto configure ip router1 --ip 192.168.10.1 --mask 255.255.255.0</div>
+    <p class="term-label">Create user account</p>
+    <div class="term"><span class="prompt">$</span> netauto configure user router1 --username admin</div>
+    <p class="term-label">Set banner message</p>
+    <div class="term"><span class="prompt">$</span> netauto configure banner router1 --message "Authorized access only"</div>
+    <p class="term-label">Set interface description</p>
+    <div class="term"><span class="prompt">$</span> netauto configure interface router1 --iface Gi0/1 --desc "Uplink to core"</div>
+    <p class="term-label">Add static route</p>
+    <div class="term"><span class="prompt">$</span> netauto configure route router1 --dest 10.0.0.0/24 --via 192.168.10.254</div>
+    <p class="term-label">Retrieve device info</p>
+    <div class="term"><span class="prompt">$</span> netauto info device router1</div>
+
+    <h3>5.2 Linux system information (Linux hosts)</h3>
+    <div class="table-wrap">
+      <table class="data">
+        <tr><th>Item</th><th>Source</th></tr>
+        <tr><td>Hostname</td><td><code>hostname</code> / Ansible fact</td></tr>
+        <tr><td>Current date and time</td><td><code>date</code></td></tr>
+        <tr><td>CPU information</td><td><code>lscpu</code> / Ansible fact</td></tr>
+        <tr><td>Memory usage</td><td><code>free -h</code></td></tr>
+        <tr><td>Disk usage</td><td><code>df -h</code></td></tr>
+        <tr><td>Logged-in users</td><td><code>who</code></td></tr>
+        <tr><td>Top 5 processes by CPU</td><td><code>ps aux --sort=-%cpu | head -6</code></td></tr>
+      </table>
+    </div>
+    <p class="term-label">Command</p>
+    <div class="term"><span class="prompt">$</span> netauto info system server1</div>
+  </section>
+
+  <section>
+    <h2><span class="num">06</span> Repository and collaboration plan</h2>
+    <p><strong>Branching:</strong> each member works on a feature branch (e.g. <code>feature/cli-commands</code>, <code>feature/ansible-roles</code>) and merges via pull request, so individual contribution is visible in commit history.</p>
+    <p class="term-label">Folder structure</p>
+    <div class="tree">netauto/
+├── cli/                 # Typer CLI source
+├── playbooks/           # Ansible playbooks, one per task
+├── roles/               # Reusable Ansible roles
+├── inventory/           # Host/group definitions
+├── lab/                 # Docker / Containerlab topology files
+├── docs/                # README, usage guide
+└── reflections/         # Personal reflection reports</div>
+    <p><strong>Commit convention:</strong> short, descriptive messages (e.g. <code>add: static route playbook</code>, <code>fix: ip validation in CLI</code>) so the history reads as a clear record of who did what.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">07</span> Team roles and responsibilities</h2>
+    <div class="table-wrap">
+      <table class="data">
+        <tr><th>Member</th><th>Primary responsibility</th></tr>
+        <tr><td class="placeholder">[Name 1]</td><td>Typer CLI development and command structure</td></tr>
+        <tr><td class="placeholder">[Name 2]</td><td>Ansible roles — device configuration tasks</td></tr>
+        <tr><td class="placeholder">[Name 3]</td><td>Ansible roles — Linux system information collection</td></tr>
+        <tr><td class="placeholder">[Name 4]</td><td>Docker / Containerlab lab environment and inventory setup</td></tr>
+        <tr><td class="placeholder">[Name 5]</td><td>Integration testing, README documentation, and demo preparation</td></tr>
+      </table>
+    </div>
+    <p>All members contribute to their own personal reflection report and are expected to commit code in their assigned area throughout the project, not only at the end.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">08</span> Timeline</h2>
+    <div class="table-wrap">
+      <table class="data">
+        <tr><th>Dates</th><th>Milestone</th></tr>
+        <tr><td>21–23 June</td><td>Repo setup, inventory design, lab environment (Docker/Containerlab) running</td></tr>
+        <tr><td>24–28 June</td><td>Ansible roles/playbooks written and tested for all six device + system tasks</td></tr>
+        <tr><td>29 June – 2 July</td><td>Typer CLI built and wired to playbooks via ansible-runner</td></tr>
+        <tr><td>3–4 July</td><td>End-to-end testing, bug fixes, README and usage documentation</td></tr>
+        <tr><td>5 July</td><td>Each member finalises their personal reflection report</td></tr>
+        <tr><td>6 July, 09:00</td><td><strong>Submission:</strong> GitHub repo URL + reflection reports</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">09</span> Deliverables</h2>
+    <ul>
+      <li>GitHub repository URL, containing all source code and a clear commit history from every member</li>
+      <li>A 2-page personal reflection report per member, covering individual contribution, collaboration challenges, and lessons learned</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">10</span> Risks and mitigations</h2>
+    <div class="table-wrap">
+      <table class="data">
+        <tr><th>Risk</th><th>Mitigation</th></tr>
+        <tr><td>Uneven commit activity across members</td><td>Assign clearly owned modules (Section 7) so each person's work is independently visible</td></tr>
+        <tr><td>Lab environment setup taking longer than expected</td><td>Start Docker/Containerlab setup in the first 2–3 days, before playbook logic depends on it</td></tr>
+        <tr><td>Merge conflicts close to the deadline</td><td>Use feature branches and small, frequent pull requests rather than long-lived branches</td></tr>
+        <tr><td>NETCONF/SSH connectivity issues with simulated devices</td><td>Validate connectivity with a minimal "ping" playbook before building full configuration roles</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <footer>SECR3253 Network Programming — Group Assignment (5%) — Marina Binti Md Arshad, 2025/2026-2</footer>
+
+</div>
+</body>
+</html>

@@ -1,8 +1,17 @@
 __pycache__/
 *.pyc
+*.pyo
 .venv/
 venv/
 *.retry
 .env
 *.vault_pass
 .DS_Store
+
+# Python package build artifacts
+*.egg-info/
+dist/
+build/
+
+# ansible-runner artifacts
+artifacts/

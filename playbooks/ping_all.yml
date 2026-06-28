@@ -1,0 +1,43 @@
+# =============================================================================
+# playbooks/ping_all.yml — Connectivity Smoke Test
+# =============================================================================
+# Validates that Ansible can reach all hosts in the lab.
+# Run after deploying the Containerlab topology:
+#
+#   ansible-playbook playbooks/ping_all.yml
+#
+# Expected result: all 4 hosts return "SUCCESS".
+# =============================================================================
+---
+
+# ── Test 1: Router connectivity (Arista cEOS) ───────────────────────────────
+- name: "Smoke test — Routers (Arista cEOS)"
+  hosts: routers
+  gather_facts: false
+  tasks:
+
+    - name: Gather basic device facts via EOS
+      arista.eos.eos_facts:
+        gather_subset:
+          - min
+      register: eos_facts
+
+    - name: Display router hostname and version
+      ansible.builtin.debug:
+        msg: >-
+          ✔ {{ eos_facts.ansible_facts.ansible_net_hostname }}
+          running EOS {{ eos_facts.ansible_facts.ansible_net_version }}
+
+# ── Test 2: Linux server connectivity ────────────────────────────────────────
+- name: "Smoke test — Linux Servers (Alpine)"
+  hosts: linux_servers
+  gather_facts: false
+  tasks:
+
+    - name: Ping server via Ansible
+      ansible.builtin.ping:
+      register: ping_result
+
+    - name: Display ping result
+      ansible.builtin.debug:
+        msg: "✔ {{ inventory_hostname }} is reachable (ping: {{ ping_result.ping }})"
