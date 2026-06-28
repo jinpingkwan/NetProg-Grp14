@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netauto"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "typer[all]",
+    "ansible-runner",
+]
+
+[project.scripts]
+netauto = "cli.main:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cli*"]

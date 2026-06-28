@@ -1,0 +1,11 @@
+# =============================================================================
+# host_vars/server2.yml — Server 2 specific variables
+# =============================================================================
+
+# Management IP assigned by Containerlab (see netauto-lab.clab.yml)
+ansible_host: 172.20.20.22
+
+# Data-plane address (set via containerlab exec in topology file)
+data_interface: eth1
+data_ipv4: "192.168.20.10/24"
+data_gateway: "192.168.20.1"

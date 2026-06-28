@@ -1,0 +1,33 @@
+# =============================================================================
+# group_vars/routers.yml — Shared variables for all Arista cEOS routers
+# =============================================================================
+# These variables apply to every host in the [routers] group.
+# Per-host overrides (like ansible_host) live in host_vars/<hostname>.yml.
+# =============================================================================
+
+# ── Connection ───────────────────────────────────────────────────────────────
+# Use Ansible's network_cli connection plugin for SSH-based CLI access.
+# For playbooks that need NETCONF, override with ansible.netcommon.netconf.
+ansible_connection: ansible.netcommon.network_cli
+ansible_network_os: arista.eos.eos
+
+# ── Credentials ──────────────────────────────────────────────────────────────
+ansible_user: admin
+ansible_password: admin
+
+# ── Privilege Escalation ─────────────────────────────────────────────────────
+# cEOS requires "enable" to enter privileged EXEC mode for config changes.
+ansible_become: true
+ansible_become_method: enable
+ansible_become_password: admin
+
+# ── NETCONF ──────────────────────────────────────────────────────────────────
+# Port used by NETCONF agent on the routers (configured in startup-config).
+# Playbooks using NETCONF should set:
+#   ansible_connection: ansible.netcommon.netconf
+netconf_port: 830
+
+# ── Timeouts ─────────────────────────────────────────────────────────────────
+# cEOS containers can be slow to boot; give them extra time.
+ansible_command_timeout: 60
+ansible_connect_timeout: 30

@@ -1,0 +1,15 @@
+# =============================================================================
+# host_vars/router2.yml — Router 2 specific variables
+# =============================================================================
+
+# Management IP assigned by Containerlab (see netauto-lab.clab.yml)
+ansible_host: 172.20.20.12
+
+# Data-plane interfaces (used by playbooks for reference)
+interfaces:
+  Ethernet1:
+    description: "Link to router1 (backbone)"
+    ipv4: "10.10.10.2/30"
+  Ethernet2:
+    description: "LAN to server2"
+    ipv4: "192.168.20.1/24"
