@@ -1,0 +1,82 @@
+# =============================================================================
+# playbooks/discover.yml — Lab Device Discovery
+# =============================================================================
+# Probes every host in the inventory and reports reachable / unreachable
+# status, along with basic identity info for hosts that respond.
+#
+# Usage (direct):
+#   ansible-playbook playbooks/discover.yml
+#
+# Usage (CLI):
+#   netauto discover
+# =============================================================================
+---
+
+# ── Play 1: Linux Servers ─────────────────────────────────────────────────────
+- name: "Discover — Linux Servers"
+  hosts: linux_servers
+  gather_facts: false
+  ignore_unreachable: true
+
+  tasks:
+
+    - name: Ping host
+      ansible.builtin.ping:
+      register: ping_result
+      ignore_errors: true
+
+    - name: Get OS release
+      ansible.builtin.command: cat /etc/os-release
+      register: os_result
+      changed_when: false
+      ignore_errors: true
+      when: ping_result is succeeded
+
+    - name: Get uptime
+      ansible.builtin.command: uptime -p
+      register: uptime_result
+      changed_when: false
+      ignore_errors: true
+      when: ping_result is succeeded
+
+    - name: Report — reachable
+      ansible.builtin.debug:
+        msg: "{{ ('[ UP ]  ' + inventory_hostname + ' (' + ansible_host + ')').split('\n') +
+              ['  OS:      ' + (os_result.stdout_lines | select('match', '^PRETTY_NAME') | list | first | regex_replace('PRETTY_NAME=\"(.*)\"', '\\1') if os_result.stdout_lines is defined else 'unknown')] +
+              ['  Uptime:  ' + (uptime_result.stdout if uptime_result.stdout is defined else 'unknown')] }}"
+      when: ping_result is succeeded
+
+    - name: Report — unreachable
+      ansible.builtin.debug:
+        msg: "[DOWN]  {{ inventory_hostname }} ({{ ansible_host }}) — unreachable"
+      when: ping_result is not succeeded
+
+
+# ── Play 2: Network Devices (Routers) ────────────────────────────────────────
+- name: "Discover — Network Devices"
+  hosts: routers
+  gather_facts: false
+  ignore_unreachable: true
+
+  tasks:
+
+    - name: Gather minimal EOS facts
+      arista.eos.eos_facts:
+        gather_subset:
+          - min
+      register: eos_result
+      ignore_errors: true
+
+    - name: Report — reachable
+      ansible.builtin.debug:
+        msg:
+          - "[ UP ]  {{ inventory_hostname }} ({{ ansible_host }})"
+          - "  Model:    {{ eos_result.ansible_facts.ansible_net_model | default('unknown') }}"
+          - "  Version:  EOS {{ eos_result.ansible_facts.ansible_net_version | default('unknown') }}"
+          - "  Hostname: {{ eos_result.ansible_facts.ansible_net_hostname | default('unknown') }}"
+      when: eos_result is succeeded
+
+    - name: Report — unreachable
+      ansible.builtin.debug:
+        msg: "[DOWN]  {{ inventory_hostname }} ({{ ansible_host }}) — unreachable"
+      when: eos_result is not succeeded
