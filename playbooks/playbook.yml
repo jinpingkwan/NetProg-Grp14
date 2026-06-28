@@ -1,2 +1,130 @@
 ---
-- name: 
+# =============================================================================
+# playbooks/playbook.yml — Device Configuration Playbook (Arista cEOS Routers)
+# =============================================================================
+# Configures both routers with:
+#   - Interface IP addresses
+#   - Interface descriptions
+#   - User account
+#   - Banner (MOTD)
+#   - Static routes
+# Then retrieves and displays device information.
+#
+# Run:
+#   ansible-playbook playbooks/playbook.yml
+# =============================================================================
+
+# ── Play 1: Configure Interface Descriptions ─────────────────────────────────
+- name: "Configure interface descriptions"
+  hosts: routers
+  gather_facts: false
+  tasks:
+
+    - name: Set interface descriptions
+      arista.eos.eos_interfaces:
+        config:
+          - name: Ethernet1
+            description: "{{ interfaces.Ethernet1.description }}"
+            enabled: true
+          - name: Ethernet2
+            description: "{{ interfaces.Ethernet2.description }}"
+            enabled: true
+        state: merged
+
+# ── Play 2: Configure Interface IP Addresses ─────────────────────────────────
+- name: "Configure interface IP addresses"
+  hosts: routers
+  gather_facts: false
+  tasks:
+
+    - name: Set IP addresses on data interfaces
+      arista.eos.eos_l3_interfaces:
+        config:
+          - name: Ethernet1
+            ipv4:
+              - address: "{{ interfaces.Ethernet1.ipv4 }}"
+          - name: Ethernet2
+            ipv4:
+              - address: "{{ interfaces.Ethernet2.ipv4 }}"
+        state: merged
+
+# ── Play 3: Configure User Account ───────────────────────────────────────────
+- name: "Configure user account"
+  hosts: routers
+  gather_facts: false
+  tasks:
+
+    - name: Create netops user with privilege 15
+      arista.eos.eos_config:
+        lines:
+          - username netops privilege 15 role network-admin secret 0 netops123
+
+# ── Play 4: Configure Banner (MOTD) ──────────────────────────────────────────
+- name: "Configure banner message"
+  hosts: routers
+  gather_facts: false
+  tasks:
+
+    - name: Set MOTD banner
+      arista.eos.eos_banner:
+        banner: motd
+        text: |
+          =========================================
+            NetAuto Lab — {{ inventory_hostname }}
+            Authorized access only.
+            Managed by Ansible.
+          =========================================
+        state: present
+
+# ── Play 5: Configure Static Routes ──────────────────────────────────────────
+- name: "Configure static routes"
+  hosts: routers
+  gather_facts: false
+  tasks:
+
+    - name: Set static route on router1 (to server2 LAN via router2)
+      arista.eos.eos_static_routes:
+        config:
+          - vrf: default
+            address_families:
+              - afi: ipv4
+                routes:
+                  - dest: 192.168.20.0/24
+                    next_hops:
+                      - forward_router_address: 10.10.10.2
+        state: merged
+      when: inventory_hostname == "router1"
+
+    - name: Set static route on router2 (to server1 LAN via router1)
+      arista.eos.eos_static_routes:
+        config:
+          - vrf: default
+            address_families:
+              - afi: ipv4
+                routes:
+                  - dest: 192.168.10.0/24
+                    next_hops:
+                      - forward_router_address: 10.10.10.1
+        state: merged
+      when: inventory_hostname == "router2"
+
+# ── Play 6: Retrieve and Display Device Information ──────────────────────────
+- name: "Retrieve device information"
+  hosts: routers
+  gather_facts: false
+  tasks:
+
+    - name: Gather device facts from routers
+      arista.eos.eos_facts:
+        gather_subset:
+          - default
+          - interfaces
+
+    - name: Display device information
+      ansible.builtin.debug:
+        msg:
+          - "Hostname    : {{ ansible_net_hostname }}"
+          - "EOS Version : {{ ansible_net_version }}"
+          - "Model       : {{ ansible_net_model }}"
+          - "Serial      : {{ ansible_net_serialnum }}"
+          - "Interfaces  : {{ ansible_net_interfaces.keys() | list }}"
