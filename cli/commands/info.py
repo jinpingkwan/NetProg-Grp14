@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 import typer
 
@@ -18,6 +18,10 @@ def device_info(
 @app.command("system")
 def system_info(
     host: Annotated[str, typer.Argument(help="Inventory hostname of the target Linux host")],
+    host_ip: Annotated[Optional[str], typer.Option("--host", help="Override the target IP or hostname (e.g. 172.20.20.21)")] = None,
 ) -> None:
     """Collect and display Linux system information (hostname, CPU, memory, disk, users, top processes)."""
-    run_playbook("info_system", host, {})
+    extra = {}
+    if host_ip:
+        extra["ansible_host"] = host_ip
+    run_playbook("info_system", host, extra)
