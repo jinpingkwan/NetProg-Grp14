@@ -42,7 +42,7 @@
     - name: Report — reachable
       ansible.builtin.debug:
         msg: "{{ ('[ UP ]  ' + inventory_hostname + ' (' + ansible_host + ')').split('\n') +
-              ['  OS:      ' + (os_result.stdout_lines | select('match', '^PRETTY_NAME') | list | first | regex_replace('PRETTY_NAME=\"(.*)\"', '\\1') if os_result.stdout_lines is defined else 'unknown')] +
+              ['  OS:      ' + (os_result.stdout_lines | select('match', '^PRETTY_NAME') | list | first | regex_replace('PRETTY_NAME=\\\"(.*)\\\"', '\\1') if os_result.stdout_lines is defined else 'unknown')] +
               ['  Uptime:  ' + (uptime_result.stdout if uptime_result.stdout is defined else 'unknown')] }}"
       when: ping_result is succeeded
 
@@ -60,23 +60,23 @@
 
   tasks:
 
-    - name: Gather minimal EOS facts
-      arista.eos.eos_facts:
+    - name: Gather minimal IOS facts
+      cisco.ios.ios_facts:
         gather_subset:
           - min
-      register: eos_result
+      register: ios_result
       ignore_errors: true
 
     - name: Report — reachable
       ansible.builtin.debug:
         msg:
           - "[ UP ]  {{ inventory_hostname }} ({{ ansible_host }})"
-          - "  Model:    {{ eos_result.ansible_facts.ansible_net_model | default('unknown') }}"
-          - "  Version:  EOS {{ eos_result.ansible_facts.ansible_net_version | default('unknown') }}"
-          - "  Hostname: {{ eos_result.ansible_facts.ansible_net_hostname | default('unknown') }}"
-      when: eos_result is succeeded
+          - "  Model:    {{ ios_result.ansible_facts.ansible_net_model | default('unknown') }}"
+          - "  Version:  IOS-XE {{ ios_result.ansible_facts.ansible_net_version | default('unknown') }}"
+          - "  Hostname: {{ ios_result.ansible_facts.ansible_net_hostname | default('unknown') }}"
+      when: ios_result is succeeded
 
     - name: Report — unreachable
       ansible.builtin.debug:
         msg: "[DOWN]  {{ inventory_hostname }} ({{ ansible_host }}) — unreachable"
-      when: eos_result is not succeeded
+      when: ios_result is not succeeded

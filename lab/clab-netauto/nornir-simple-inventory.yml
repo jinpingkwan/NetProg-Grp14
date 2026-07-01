@@ -1,0 +1,21 @@
+---
+router1:
+    username: admin
+    password: admin
+    platform: cisco_csr1000v
+    hostname: 172.20.20.11
+router2:
+    username: admin
+    password: admin
+    platform: cisco_csr1000v
+    hostname: 172.20.20.12
+server1:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.21
+server2:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.22

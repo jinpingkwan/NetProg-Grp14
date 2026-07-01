@@ -15,3 +15,10 @@ build/
 
 # ansible-runner artifacts
 artifacts/
+
+# Cisco / network device images (too large for Git)
+*.iso
+*.qcow2
+*.ova
+*.vmdk
+*.tar

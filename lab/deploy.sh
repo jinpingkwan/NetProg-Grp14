@@ -12,10 +12,28 @@ cd "$SCRIPT_DIR"
 TOPO_FILE="netauto-lab.clab.yml"
 LINUX_IMAGE="netauto-linux"
 DOCKERFILE="Dockerfile.linux"
+CSR_IMAGE="vrnetlab/cisco_csr1000v:16.09.05"
 
 echo "============================================="
 echo "  NetAuto Lab — Deploy"
 echo "============================================="
+echo
+
+# ── Step 0: Check for CSR1000v vrnetlab image ────────────────────────────────
+echo "[0/3] Checking for CSR1000v image ($CSR_IMAGE)..."
+if docker image inspect "$CSR_IMAGE" &>/dev/null; then
+    echo "     ✔ CSR1000v image found."
+else
+    echo "     ✖ CSR1000v image NOT found!"
+    echo
+    echo "     Build it with vrnetlab:"
+    echo "       git clone https://github.com/hellt/vrnetlab.git"
+    echo "       cd vrnetlab/cisco/csr1000v"
+    echo "       cp /path/to/csr1000v-universalk9.16.09.05.qcow2 ."
+    echo "       make"
+    echo
+    exit 1
+fi
 echo
 
 # ── Step 1: Build custom Linux image ─────────────────────────────────────────
@@ -43,7 +61,7 @@ echo "    server1  → 172.20.20.21"
 echo "    server2  → 172.20.20.22"
 echo ""
 echo "  Quick test:"
-echo "    ssh admin@172.20.20.11          # router1"
+echo "    ssh admin@172.20.20.11          # router1 (CSR1000v)"
 echo "    ssh root@172.20.20.21           # server1 (password: netauto)"
 echo "    ansible-playbook playbooks/ping_all.yml"
 echo "============================================="

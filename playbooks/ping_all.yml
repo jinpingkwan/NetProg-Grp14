@@ -10,23 +10,23 @@
 # =============================================================================
 ---
 
-# ── Test 1: Router connectivity (Arista cEOS) ───────────────────────────────
-- name: "Smoke test — Routers (Arista cEOS)"
+# ── Test 1: Router connectivity (Cisco CSR1000v) ────────────────────────────
+- name: "Smoke test — Routers (Cisco CSR1000v)"
   hosts: routers
   gather_facts: false
   tasks:
 
-    - name: Gather basic device facts via EOS
-      arista.eos.eos_facts:
+    - name: Gather basic device facts via IOS
+      cisco.ios.ios_facts:
         gather_subset:
           - min
-      register: eos_facts
+      register: ios_facts
 
     - name: Display router hostname and version
       ansible.builtin.debug:
         msg: >-
-          ✔ {{ eos_facts.ansible_facts.ansible_net_hostname }}
-          running EOS {{ eos_facts.ansible_facts.ansible_net_version }}
+          ✔ {{ ios_facts.ansible_facts.ansible_net_hostname }}
+          running IOS-XE {{ ios_facts.ansible_facts.ansible_net_version }}
 
 # ── Test 2: Linux server connectivity ────────────────────────────────────────
 - name: "Smoke test — Linux Servers (Alpine)"
