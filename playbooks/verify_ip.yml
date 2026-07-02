@@ -1,0 +1,13 @@
+---
+- name: Verify IP Configuration
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+
+    - name: Gather L3 Facts
+      arista.eos.eos_facts:
+
+    - name: Show Interfaces
+      debug:
+        var: ansible_net_interfaces

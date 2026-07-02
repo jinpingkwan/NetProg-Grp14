@@ -1,0 +1,13 @@
+---
+- name: Verify Static Routes
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+
+    - name: Collect Facts
+      arista.eos.eos_facts:
+
+    - name: Show Routing Information
+      debug:
+        var: ansible_net_interfaces

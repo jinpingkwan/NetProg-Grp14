@@ -1,0 +1,10 @@
+---
+- name: Verify Disk Usage
+  hosts: linux_servers
+  gather_facts: yes
+
+  tasks:
+
+    - name: Show Disk Information
+      debug:
+        var: ansible_mounts

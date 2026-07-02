@@ -1,0 +1,12 @@
+---
+- name: Verify Running Processes
+  hosts: linux_servers
+
+  tasks:
+
+    - name: Top 5 CPU Processes
+      shell: ps -eo pid,comm,%cpu --sort=-%cpu | head -6
+      register: cpu_process
+
+    - debug:
+        var: cpu_process.stdout_lines

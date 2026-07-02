@@ -1,0 +1,27 @@
+---
+- name: Verify Network Device Configuration
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+
+    - name: Gather EOS Facts
+      arista.eos.eos_facts:
+
+    - name: Verify hostname exists
+      assert:
+        that:
+          - ansible_net_hostname is defined
+        fail_msg: "Hostname not found."
+
+    - name: Verify EOS version exists
+      assert:
+        that:
+          - ansible_net_version is defined
+
+    - name: Display device information
+      debug:
+        msg:
+          - "Hostname : {{ ansible_net_hostname }}"
+          - "Version  : {{ ansible_net_version }}"
+          - "Model    : {{ ansible_net_model }}"

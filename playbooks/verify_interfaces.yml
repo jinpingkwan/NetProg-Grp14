@@ -1,0 +1,25 @@
+---
+- name: Verify Interfaces
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+
+    - name: Gather Interface Facts
+      arista.eos.eos_facts:
+        gather_subset:
+          - interfaces
+
+    - name: Verify Ethernet1 exists
+      assert:
+        that:
+          - "'Ethernet1' in ansible_net_interfaces"
+
+    - name: Verify Ethernet2 exists
+      assert:
+        that:
+          - "'Ethernet2' in ansible_net_interfaces"
+
+    - name: Show interfaces
+      debug:
+        var: ansible_net_interfaces
