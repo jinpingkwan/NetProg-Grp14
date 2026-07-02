@@ -1,0 +1,13 @@
+---
+- name: Verify Banner Configuration
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+
+    - name: Gather Facts
+      arista.eos.eos_facts:
+
+    - name: Display Banner Check
+      debug:
+        msg: "Verify MOTD Banner is configured."

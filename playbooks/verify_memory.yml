@@ -1,0 +1,12 @@
+---
+- name: Verify Memory Usage
+  hosts: linux_servers
+
+  tasks:
+
+    - name: Memory Usage
+      shell: free -h
+      register: memory
+
+    - debug:
+        var: memory.stdout_lines
