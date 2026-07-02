@@ -1,18 +1,25 @@
 # =============================================================================
 # NetAuto — Containerlab Topology
 # =============================================================================
-# Deploys 2 × Cisco CSR1000v routers and 2 × Alpine Linux servers.
+# Deploys 2 × Cisco CSR1000v (IOS-XE) routers and 2 × Alpine Linux servers.
 #
 # Prerequisites:
 #   1. Docker installed and running
 #   2. Containerlab installed  (https://containerlab.dev/install/)
-#   3. CSR1000v vrnetlab image built:
-#        cd vrnetlab/cisco/csr1000v
-#        cp /path/to/csr1000v-universalk9.16.09.05.qcow2 .
-#        make
-#        (produces image: vrnetlab/cisco_csr1000v:16.09.05)
+#   3. CSR1000v vrnetlab image built (from lab/vrnetlab/cisco/csr1000v, with
+#      the .qcow2 placed in that directory):
+#        make docker-image
+#      This produces the image referenced below, tagged after the qcow2
+#      version (e.g. csr1000v-universalk9.16.09.05.qcow2 -> vrnetlab/cisco_csr1000v:16.09.05).
+#      Note: this containerlab version has no "cisco_csr1000v" kind — CSR1000v
+#      and C8000v share the same vrnetlab boot/console handling, so the image
+#      is run under kind "cisco_c8000v" below.
 #   4. Custom Linux image built:
 #        docker build -t netauto-linux -f Dockerfile.linux .
+#
+# Note: CSR1000v is a full IOS-XE VM running inside a container (via
+# vrnetlab) rather than a native container image — expect a few minutes
+# for each router to boot before it answers SSH/NETCONF.
 #
 # Usage:
 #   sudo containerlab deploy  -t netauto-lab.clab.yml
@@ -29,10 +36,11 @@ mgmt:
 topology:
 
   defaults:
-    kind: linux
+    # CSR1000v defaults (overridden per-kind below)
+    kind: cisco_c8000v
 
   kinds:
-    cisco_csr1000v:
+    cisco_c8000v:
       image: vrnetlab/cisco_csr1000v:16.09.05
     linux:
       image: netauto-linux
@@ -40,7 +48,7 @@ topology:
   nodes:
     # ── Routers ──────────────────────────────────────────────────────────
     router1:
-      kind: cisco_csr1000v
+      kind: cisco_c8000v
       mgmt-ipv4: 172.20.20.11
       startup-config: configs/router1-startup.cfg
       # Ports exposed to the host for direct SSH / NETCONF access
@@ -49,7 +57,7 @@ topology:
         - "12831:830"    # NETCONF
 
     router2:
-      kind: cisco_csr1000v
+      kind: cisco_c8000v
       mgmt-ipv4: 172.20.20.12
       startup-config: configs/router2-startup.cfg
       ports:

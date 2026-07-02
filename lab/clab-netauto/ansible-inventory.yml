@@ -5,7 +5,7 @@ all:
     # module does not attempt using any global http proxy.
     ansible_httpapi_use_proxy: false
   children:
-    cisco_csr1000v:
+    cisco_c8000v:
       vars:
         # ansible_connection: set ansible_connection variable if required
         ansible_user: admin

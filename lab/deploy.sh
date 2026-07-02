@@ -143,6 +143,11 @@ containerlab deploy -t "$TOPO_FILE" --reconfigure
 echo "     ✔ Topology deployed."
 echo
 
+# Routers get a fresh SSH host key every redeploy but keep the same mgmt IP,
+# so stale known_hosts entries cause "host key mismatch" on the next connect.
+ssh-keygen -R 172.20.20.11 >/dev/null 2>&1 || true
+ssh-keygen -R 172.20.20.12 >/dev/null 2>&1 || true
+
 # ── Step 3: Print summary ────────────────────────────────────────────────────
 echo "[3/3] Lab summary:"
 echo

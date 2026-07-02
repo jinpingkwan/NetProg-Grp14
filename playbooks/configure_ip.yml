@@ -1,0 +1,41 @@
+# =============================================================================
+# playbooks/configure_ip.yml — Configure Interface IP Address
+# =============================================================================
+# Invoked by: netauto configure ip <host> --ip <addr> --mask <mask> [--iface <name>]
+# Required extra vars: target_host, ip_address, subnet_mask, prefix_length
+#   (prefix_length is derived from subnet_mask by cli/commands/configure.py,
+#   since ios_l3_interfaces wants "<ip>/<prefix>" rather than a dotted mask)
+# Optional extra vars: interface_name
+#   (set when --iface is passed; falls back to default_data_interface from
+#   group_vars/routers.yml when omitted)
+#
+# Usage (direct):
+#   ansible-playbook playbooks/configure_ip.yml \
+#     -e target_host=router1 -e ip_address=192.168.10.1 \
+#     -e subnet_mask=255.255.255.0 -e prefix_length=24 \
+#     -e interface_name=GigabitEthernet4
+# =============================================================================
+---
+
+- name: Configure interface IP address
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  vars:
+    target_interface: "{{ interface_name | default(default_data_interface) }}"
+
+  tasks:
+
+    - name: Set IP address on target interface
+      cisco.ios.ios_l3_interfaces:
+        config:
+          - name: "{{ target_interface }}"
+            ipv4:
+              - address: "{{ ip_address }}/{{ prefix_length }}"
+        state: merged
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: >-
+          ✔ {{ inventory_hostname }}: {{ target_interface }}
+          set to {{ ip_address }}/{{ prefix_length }} ({{ subnet_mask }})

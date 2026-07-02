@@ -30,4 +30,9 @@ netconf_port: 830
 # ── Timeouts ─────────────────────────────────────────────────────────────────
 # CSR1000v containers can be slow to boot (VM-in-Docker); give them extra time.
 ansible_command_timeout: 60
-ansible_connect_timeout: 30
+ansible_connect_timeout: 60
+
+# ── Defaults for CLI commands ─────────────────────────────────────────────────
+# `netauto configure ip` doesn't take an --iface flag, so it targets this
+# interface (the LAN-facing data link — see host_vars/<host>.yml).
+default_data_interface: GigabitEthernet3

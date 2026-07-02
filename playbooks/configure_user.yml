@@ -1,0 +1,26 @@
+# =============================================================================
+# playbooks/configure_user.yml — Configure User Account
+# =============================================================================
+# Invoked by: netauto configure user <host> --username <name>
+# Required extra vars: target_host, new_username, new_password
+#
+# Usage (direct):
+#   ansible-playbook playbooks/configure_user.yml \
+#     -e target_host=router1 -e new_username=netops -e new_password=netops123
+# =============================================================================
+---
+
+- name: Configure user account
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Create user with privilege 15
+      cisco.ios.ios_config:
+        lines:
+          - "username {{ new_username }} privilege 15 secret 0 {{ new_password }}"
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: "✔ {{ inventory_hostname }}: user '{{ new_username }}' created with privilege 15"

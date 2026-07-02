@@ -1,0 +1,31 @@
+# =============================================================================
+# playbooks/info_device.yml — Network Device Information
+# =============================================================================
+# Invoked by: netauto info device <host>
+# Required extra var: target_host (set automatically by cli/runner.py)
+#
+# Usage (direct):
+#   ansible-playbook playbooks/info_device.yml -e target_host=router1
+# =============================================================================
+---
+
+- name: Retrieve and display device information
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Gather device facts
+      cisco.ios.ios_facts:
+        gather_subset:
+          - default
+          - interfaces
+
+    - name: Display device information
+      ansible.builtin.debug:
+        msg:
+          - "Hostname       : {{ ansible_net_hostname }}"
+          - "IOS-XE Version : {{ ansible_net_version }}"
+          - "Model          : {{ ansible_net_model }}"
+          - "Serial         : {{ ansible_net_serialnum }}"
+          - "Interfaces     : {{ ansible_net_interfaces.keys() | list }}"

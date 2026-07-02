@@ -1,0 +1,27 @@
+# =============================================================================
+# playbooks/configure_banner.yml — Configure Login Banner (MOTD)
+# =============================================================================
+# Invoked by: netauto configure banner <host> --message <text>
+# Required extra vars: target_host, banner_message
+#
+# Usage (direct):
+#   ansible-playbook playbooks/configure_banner.yml \
+#     -e target_host=router1 -e banner_message="Authorized access only"
+# =============================================================================
+---
+
+- name: Configure banner message
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Set MOTD banner
+      cisco.ios.ios_banner:
+        banner: motd
+        text: "{{ banner_message }}"
+        state: present
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: "✔ {{ inventory_hostname }}: MOTD banner updated"

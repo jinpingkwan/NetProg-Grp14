@@ -2,12 +2,12 @@
 router1:
     username: admin
     password: admin
-    platform: cisco_csr1000v
+    platform: cisco_c8000v
     hostname: 172.20.20.11
 router2:
     username: admin
     password: admin
-    platform: cisco_csr1000v
+    platform: cisco_c8000v
     hostname: 172.20.20.12
 server1:
     username: 

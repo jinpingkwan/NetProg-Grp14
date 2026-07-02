@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetAuto — Achievements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f7f6;
+    --surface:#ffffff;
+    --ink:#12181f;
+    --muted:#5b6573;
+    --accent:#0e7c86;
+    --accent-dim:#dcecea;
+    --rule:#dde2e2;
+    --term-bg:#0f1620;
+    --term-text:#d7e5e4;
+    --term-prompt:#34d6c4;
+    --good:#0e7c56;
+    --good-dim:#dcece4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",sans-serif;
+    font-size:16px;
+    line-height:1.65;
+  }
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding:56px 24px 96px;
+  }
+  h1,h2,h3{
+    font-family:"IBM Plex Mono",monospace;
+    font-weight:600;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  header.doc-header{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:24px;
+    margin-bottom:32px;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13px;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin:0 0 10px;
+  }
+  h1{
+    font-size:30px;
+    margin:0 0 6px;
+    line-height:1.25;
+  }
+  .subtitle{
+    font-size:16px;
+    color:var(--muted);
+    margin:0 0 4px;
+  }
+  section{ margin:40px 0; }
+  h2{
+    font-size:18px;
+    margin:0 0 16px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--rule);
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  h2 .num{ color:var(--accent); }
+  h3{
+    font-size:14.5px;
+    margin:24px 0 10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    font-weight:500;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  p{ margin:0 0 14px; }
+  ul{ margin:0 0 14px; padding-left:22px; }
+  li{ margin-bottom:6px; }
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    margin:0 0 14px;
+  }
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+    background:var(--surface);
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:10px 14px;
+    border-bottom:1px solid var(--rule);
+  }
+  table.data th{
+    font-family:"IBM Plex Mono",monospace;
+    font-weight:500;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+    background:var(--accent-dim);
+  }
+  table.data tr:last-child td{ border-bottom:none; }
+  table.data td.num-cell{
+    font-family:"IBM Plex Mono",monospace;
+    color:var(--accent);
+    font-weight:600;
+  }
+  code{
+    font-family:"IBM Plex Mono",monospace;
+    background:var(--accent-dim);
+    color:var(--accent);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:0.92em;
+  }
+  .term{
+    background:var(--term-bg);
+    color:var(--term-text);
+    border-radius:8px;
+    padding:14px 18px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13.5px;
+    line-height:1.7;
+    margin:0 0 12px;
+    overflow-x:auto;
+    white-space:pre;
+  }
+  .term .prompt{ color:var(--term-prompt); }
+  .term-label{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    margin:0 0 6px;
+  }
+  .badge{
+    display:inline-block;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;
+    color:var(--good);
+    background:var(--good-dim);
+    border-radius:4px;
+    padding:2px 8px;
+  }
+  .badge.accent{
+    color:var(--accent);
+    background:var(--accent-dim);
+  }
+  footer{
+    margin-top:48px;
+    padding-top:18px;
+    border-top:1px solid var(--rule);
+    font-size:12.5px;
+    color:var(--muted);
+    font-family:"IBM Plex Mono",monospace;
+  }
+  #print-btn{
+    position:fixed;
+    top:20px;
+    right:20px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:9px 14px;
+    cursor:pointer;
+  }
+  #print-btn:hover{ background:var(--accent); }
+  @media (max-width:640px){
+    .page{ padding:36px 16px 72px; }
+    h1{ font-size:24px; }
+    #print-btn{ position:static; display:block; margin:0 0 24px; width:fit-content; }
+  }
+  @media print{
+    #print-btn{ display:none; }
+    body{ background:#fff; }
+    .page{ padding:0; max-width:100%; }
+    section{ margin:24px 0; }
+    table.data tr, .term{ page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+<button id="print-btn" type="button" onclick="window.print()">Print / save as PDF</button>
+<div class="page">
+
+  <header class="doc-header">
+    <p class="eyebrow">NetAuto — Project status</p>
+    <h1>Achievements</h1>
+    <p class="subtitle">Every objective from the project proposal, delivered and working end-to-end against a live Containerlab environment.</p>
+  </header>
+
+  <section>
+    <h2><span class="num">01</span> Overview</h2>
+    <p>The proposal (<code>NetAuto_Project_Proposal.html</code>) committed to a Typer CLI wrapping Ansible playbooks against a Docker/Containerlab lab, covering five device-configuration tasks, device info retrieval, and Linux system reporting. All seven of those objectives are implemented and reachable through the <code>netauto</code> command, plus fleet-wide discovery and a full documentation set that weren't in the original scope.</p>
+    <div class="table-wrap">
+      <table class="data">
+        <tr><th>Metric</th><th>Count</th></tr>
+        <tr><td>CLI commands</td><td class="num-cell">8</td></tr>
+        <tr><td>Ansible playbooks</td><td class="num-cell">10</td></tr>
+        <tr><td>Lab devices automated</td><td class="num-cell">4</td></tr>
+        <tr><td>Platforms (Cisco IOS-XE, Linux)</td><td class="num-cell">2</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span> Proposal objectives — delivered</h2>
+    <p>Cross-referenced against Section 02 of the proposal. All seven are complete.</p>
+    <div class="table-wrap">
+      <table class="data">
+        <tr><th>Objective</th><th>Status</th><th>Delivered via</th></tr>
+        <tr><td>Configure an IP address on a target device</td><td><span class="badge">✓ done</span></td><td><code>netauto configure ip</code></td></tr>
+        <tr><td>Create a user account on a target device</td><td><span class="badge">✓ done</span></td><td><code>netauto configure user</code></td></tr>
+        <tr><td>Set a banner message on a target device</td><td><span class="badge">✓ done</span></td><td><code>netauto configure banner</code></td></tr>
+        <tr><td>Set an interface description</td><td><span class="badge">✓ done</span></td><td><code>netauto configure interface</code></td></tr>
+        <tr><td>Add a static route</td><td><span class="badge">✓ done</span></td><td><code>netauto configure route</code></td></tr>
+        <tr><td>Retrieve and display general device info</td><td><span class="badge">✓ done</span></td><td><code>netauto info device</code></td></tr>
+        <tr><td>Collect Linux system information</td><td><span class="badge">✓ done</span></td><td><code>netauto info system</code> · <code>linux_sysinfo</code> role</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span> Beyond the proposal</h2>
+    <ul>
+      <li><strong>Fleet discovery</strong> <span class="badge accent">extra</span> — <code>netauto discover</code> sweeps the whole inventory in one pass and reports UP/DOWN, model, OS, and version per host; not one of the original seven objectives, added as the first command run after any lab deploy.</li>
+      <li><strong>Real IOS-XE, not just a simulator</strong> <span class="badge accent">extra</span> — the lab runs two actual Cisco CSR1000v VMs via vrnetlab/QEMU under Containerlab, not a stripped-down NETCONF stub, alongside two custom Alpine Linux servers.</li>
+      <li><strong>Installable CLI</strong> <span class="badge accent">extra</span> — <code>pip install -e .</code> registers <code>netauto</code> as a real entry point (via <code>pyproject.toml</code>), routing every subcommand through <code>ansible-runner</code> rather than shelling out to <code>ansible-playbook</code>.</li>
+      <li><strong>Documentation set</strong> <span class="badge accent">extra</span> — an installation guide, a full CLI→playbook reference map, and a future-improvements writeup (dynamic inventory via NetBox) beyond the proposal's planned README.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span> Try it</h2>
+    <p class="term-label">Discover the fleet</p>
+    <div class="term"><span class="prompt">$</span> netauto discover</div>
+    <p class="term-label">Configure a router (default data interface)</p>
+    <div class="term"><span class="prompt">$</span> netauto configure ip router1 --ip 192.168.10.1 --mask 255.255.255.0</div>
+    <p class="term-label">Configure a specific interface</p>
+    <div class="term"><span class="prompt">$</span> netauto configure ip router1 --ip 192.168.20.1 --mask 255.255.255.0 --iface GigabitEthernet4</div>
+    <p class="term-label">Pull Linux system info</p>
+    <div class="term"><span class="prompt">$</span> netauto info system server1</div>
+  </section>
+
+  <footer>NetAuto — reflects the current state of the repository. See <code>NetAuto_Project_Proposal.html</code> for the original proposal and <code>docs/cli-playbook-map.md</code> for the full command reference.</footer>
+
+</div>
+</body>
+</html>
