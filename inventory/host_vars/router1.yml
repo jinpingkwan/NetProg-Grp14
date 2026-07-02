@@ -6,10 +6,11 @@
 ansible_host: 172.20.20.11
 
 # Data-plane interfaces (used by playbooks for reference)
+# CSR1000v: GigabitEthernet1 = management, Gi2+ = data
 interfaces:
-  Ethernet1:
+  GigabitEthernet2:
     description: "Link to router2 (backbone)"
     ipv4: "10.10.10.1/30"
-  Ethernet2:
+  GigabitEthernet3:
     description: "LAN to server1"
     ipv4: "192.168.10.1/24"

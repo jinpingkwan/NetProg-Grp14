@@ -1,0 +1,31 @@
+# =============================================================================
+# .dockerignore — Exclude large / unnecessary files from Docker build context
+# =============================================================================
+
+# Cisco / network device images (not needed inside containers)
+*.iso
+*.qcow2
+*.ova
+*.vmdk
+*.tar
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE / editor
+.vscode/
+.idea/
+
+# Documentation
+docs/
+reflections/
+*.html
+README.md

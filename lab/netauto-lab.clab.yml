@@ -1,13 +1,16 @@
 # =============================================================================
 # NetAuto — Containerlab Topology
 # =============================================================================
-# Deploys 2 × Arista cEOS routers and 2 × Alpine Linux servers.
+# Deploys 2 × Cisco CSR1000v routers and 2 × Alpine Linux servers.
 #
 # Prerequisites:
 #   1. Docker installed and running
 #   2. Containerlab installed  (https://containerlab.dev/install/)
-#   3. cEOS image imported:
-#        docker import cEOS64-lab-4.32.3M.tar ceos:4.32.3M
+#   3. CSR1000v vrnetlab image built:
+#        cd vrnetlab/cisco/csr1000v
+#        cp /path/to/csr1000v-universalk9.16.09.05.qcow2 .
+#        make
+#        (produces image: vrnetlab/cisco_csr1000v:16.09.05)
 #   4. Custom Linux image built:
 #        docker build -t netauto-linux -f Dockerfile.linux .
 #
@@ -26,19 +29,18 @@ mgmt:
 topology:
 
   defaults:
-    # cEOS defaults (overridden per-kind below)
-    kind: ceos
+    kind: linux
 
   kinds:
-    ceos:
-      image: ceos:4.32.3M
+    cisco_csr1000v:
+      image: vrnetlab/cisco_csr1000v:16.09.05
     linux:
       image: netauto-linux
 
   nodes:
     # ── Routers ──────────────────────────────────────────────────────────
     router1:
-      kind: ceos
+      kind: cisco_csr1000v
       mgmt-ipv4: 172.20.20.11
       startup-config: configs/router1-startup.cfg
       # Ports exposed to the host for direct SSH / NETCONF access
@@ -47,7 +49,7 @@ topology:
         - "12831:830"    # NETCONF
 
     router2:
-      kind: ceos
+      kind: cisco_csr1000v
       mgmt-ipv4: 172.20.20.12
       startup-config: configs/router2-startup.cfg
       ports:
@@ -72,8 +74,9 @@ topology:
 
   links:
     # Router-to-router backbone  (10.10.10.0/30)
-    - endpoints: ["router1:eth1", "router2:eth1"]
+    # CSR1000v: Gi1=mgmt, Gi2+=data interfaces
+    - endpoints: ["router1:Gi2", "router2:Gi2"]
 
     # Router-to-server LAN segments
-    - endpoints: ["router1:eth2", "server1:eth1"]   # 192.168.10.0/24
-    - endpoints: ["router2:eth2", "server2:eth1"]   # 192.168.20.0/24
+    - endpoints: ["router1:Gi3", "server1:eth1"]   # 192.168.10.0/24
+    - endpoints: ["router2:Gi3", "server2:eth1"]   # 192.168.20.0/24
