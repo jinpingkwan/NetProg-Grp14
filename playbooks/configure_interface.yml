@@ -1,0 +1,30 @@
+# =============================================================================
+# playbooks/configure_interface.yml — Configure Interface Description
+# =============================================================================
+# Invoked by: netauto configure interface <host> --iface <name> --desc <text>
+# Required extra vars: target_host, interface_name, interface_desc
+#
+# Usage (direct):
+#   ansible-playbook playbooks/configure_interface.yml \
+#     -e target_host=router1 -e interface_name=GigabitEthernet3 \
+#     -e interface_desc="Uplink to core"
+# =============================================================================
+---
+
+- name: Configure interface description
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Set interface description
+      cisco.ios.ios_interfaces:
+        config:
+          - name: "{{ interface_name }}"
+            description: "{{ interface_desc }}"
+            enabled: true
+        state: merged
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: "✔ {{ inventory_hostname }}: {{ interface_name }} description set to '{{ interface_desc }}'"

@@ -60,7 +60,7 @@
 
   tasks:
 
-    - name: Gather minimal IOS facts
+    - name: Gather minimal IOS-XE facts
       cisco.ios.ios_facts:
         gather_subset:
           - min

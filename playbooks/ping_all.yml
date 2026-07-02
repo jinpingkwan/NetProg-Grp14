@@ -10,13 +10,13 @@
 # =============================================================================
 ---
 
-# ── Test 1: Router connectivity (Cisco CSR1000v) ────────────────────────────
+# ── Test 1: Router connectivity (Cisco CSR1000v) ─────────────────────────────
 - name: "Smoke test — Routers (Cisco CSR1000v)"
   hosts: routers
   gather_facts: false
   tasks:
 
-    - name: Gather basic device facts via IOS
+    - name: Gather basic device facts via IOS-XE
       cisco.ios.ios_facts:
         gather_subset:
           - min

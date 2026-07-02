@@ -1,5 +1,5 @@
 import ipaddress
-from typing import Annotated
+from typing import Annotated, Optional
 
 import typer
 
@@ -18,7 +18,7 @@ def _validate_ipv4(value: str) -> str:
 
 def _validate_mask(value: str) -> str:
     try:
-        ipaddress.IPv4Address(value)
+        ipaddress.IPv4Network(f"0.0.0.0/{value}")
     except ValueError:
         raise typer.BadParameter(f"'{value}' is not a valid subnet mask")
     return value
@@ -37,9 +37,19 @@ def set_ip(
     host: Annotated[str, typer.Argument(help="Inventory hostname of the target device")],
     ip: Annotated[str, typer.Option(help="IPv4 address to assign", callback=_validate_ipv4)],
     mask: Annotated[str, typer.Option(help="Subnet mask (dotted decimal)", callback=_validate_mask)],
+    iface: Annotated[
+        Optional[str],
+        typer.Option(help="Interface name (e.g. GigabitEthernet3); defaults to the router's default_data_interface"),
+    ] = None,
 ) -> None:
     """Configure an IP address on a network device interface."""
-    run_playbook("configure_ip", host, {"ip_address": ip, "subnet_mask": mask})
+    # Ansible's ios_l3_interfaces wants "<ip>/<prefix>"; derive the prefix
+    # length here since netaddr (needed by the ipaddr filter) isn't installed.
+    prefix_length = ipaddress.IPv4Network(f"0.0.0.0/{mask}").prefixlen
+    extra_vars = {"ip_address": ip, "subnet_mask": mask, "prefix_length": prefix_length}
+    if iface is not None:
+        extra_vars["interface_name"] = iface
+    run_playbook("configure_ip", host, extra_vars)
 
 
 @app.command("user")

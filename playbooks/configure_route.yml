@@ -1,0 +1,32 @@
+# =============================================================================
+# playbooks/configure_route.yml — Configure Static Route
+# =============================================================================
+# Invoked by: netauto configure route <host> --dest <cidr> --via <gateway>
+# Required extra vars: target_host, route_dest, route_gateway
+#
+# Usage (direct):
+#   ansible-playbook playbooks/configure_route.yml \
+#     -e target_host=router1 -e route_dest=10.0.0.0/24 -e route_gateway=192.168.10.254
+# =============================================================================
+---
+
+- name: Configure static route
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Add static route
+      cisco.ios.ios_static_routes:
+        config:
+          - address_families:
+              - afi: ipv4
+                routes:
+                  - dest: "{{ route_dest }}"
+                    next_hops:
+                      - forward_router_address: "{{ route_gateway }}"
+        state: merged
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: "✔ {{ inventory_hostname }}: route to {{ route_dest }} via {{ route_gateway }} added"
