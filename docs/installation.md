@@ -161,7 +161,38 @@ which shares the same vrnetlab boot/console handling).
 
 ---
 
-## 4. Deploy the lab
+## 4. Lab topology
+
+`lab/netauto-lab.clab.yml` deploys 4 nodes on a shared `172.20.20.0/24`
+management network: 2 Cisco CSR1000v routers (backbone-linked to each other)
+and 2 Alpine Linux servers, each single-homed behind one router.
+
+| Hostname | Role | Platform | Mgmt IP | Data interface(s) | Connected to |
+|---|---|---|---|---|---|
+| `router1` | Router | Cisco CSR1000v (IOS-XE, kind `cisco_c8000v`) | 172.20.20.11 | Gi2: `10.10.10.1/30` · Gi3: `192.168.10.1/24` | Gi2 ↔ `router2` Gi2 (backbone) · Gi3 ↔ `server1` eth1 (LAN) |
+| `router2` | Router | Cisco CSR1000v (IOS-XE, kind `cisco_c8000v`) | 172.20.20.12 | Gi2: `10.10.10.2/30` · Gi3: `192.168.20.1/24` | Gi2 ↔ `router1` Gi2 (backbone) · Gi3 ↔ `server2` eth1 (LAN) |
+| `server1` | Linux server | Alpine Linux (`netauto-linux` image) | 172.20.20.21 | eth1: `192.168.10.10/24` | eth1 ↔ `router1` Gi3 (LAN); default route to `192.168.20.0/24` via `router1` |
+| `server2` | Linux server | Alpine Linux (`netauto-linux` image) | 172.20.20.22 | eth1: `192.168.20.10/24` | eth1 ↔ `router2` Gi3 (LAN); default route to `192.168.10.0/24` via `router2` |
+
+```
+        10.10.10.0/30 (backbone)
+router1 ─────────────────────── router2
+  │ Gi3                            │ Gi3
+  │ 192.168.10.0/24                │ 192.168.20.0/24
+server1                          server2
+```
+
+For direct access bypassing the management network, the routers' SSH/NETCONF
+ports are also published to the host: `router1` on `localhost:12201`
+(SSH)/`12831` (NETCONF), `router2` on `12202`/`12832`.
+
+Per-host IPs and interface metadata live in `inventory/host_vars/<hostname>.yml`
+(the source of truth the playbooks read from); connection settings and
+default lab credentials live in `inventory/group_vars/{routers,linux_servers}.yml`.
+
+---
+
+## 5. Deploy the lab
 
 ```bash
 cd lab
@@ -192,7 +223,7 @@ bash destroy.sh
 
 ---
 
-## 5. Verify the installation
+## 6. Verify the installation
 
 From the project root, with the venv activated:
 
@@ -219,7 +250,9 @@ report `[ UP ]` with model/OS/version details. See
   `sudo docker images | grep csr` and make sure `lab/netauto-lab.clab.yml`
   points at the exact same tag (including the `vrnetlab/` prefix).
 
-## Running the test suite
+---
+
+## 7. Running the test suite
 
 The project includes a pytest-based test suite for the CLI commands. The
 tests mock `run_playbook`, so no Containerlab topology, Docker containers,
