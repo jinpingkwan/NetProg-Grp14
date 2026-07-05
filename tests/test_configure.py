@@ -1,6 +1,7 @@
 from unittest.mock import patch
 from typer.testing import CliRunner
 from cli.main import app
+from cli.runner import PROJECT_ROOT
 
 runner = CliRunner()
 
@@ -265,3 +266,66 @@ def test_configure_interface(mock_run):
             "interface_desc": "Uplink Port",
         },
     )
+
+
+# ==========================================================
+# BACKUP / RESTORE TESTS
+# ==========================================================
+
+@patch("cli.commands.configure.run_playbook")
+def test_configure_backup(mock_run):
+    result = runner.invoke(app, ["configure", "backup", "router1"])
+
+    assert result.exit_code == 0
+    mock_run.assert_called_once_with("backup_config", "router1", {})
+
+
+@patch("cli.commands.configure.run_playbook")
+def test_configure_restore_with_explicit_file(mock_run):
+    result = runner.invoke(
+        app,
+        [
+            "configure",
+            "restore",
+            "router1",
+            "--file",
+            "backups/router1_20260101000000.cfg",
+        ],
+    )
+
+    assert result.exit_code == 0
+    mock_run.assert_called_once_with(
+        "restore_config",
+        "router1",
+        {"backup_file": "backups/router1_20260101000000.cfg"},
+    )
+
+
+@patch("cli.commands.configure.run_playbook")
+def test_configure_restore_defaults_to_most_recent_backup(mock_run):
+    backups_dir = PROJECT_ROOT / "backups"
+    older = backups_dir / "router1_20250101000000.cfg"
+    newer = backups_dir / "router1_20260101000000.cfg"
+    older.write_text("old config")
+    newer.write_text("new config")
+
+    try:
+        result = runner.invoke(app, ["configure", "restore", "router1"])
+    finally:
+        older.unlink()
+        newer.unlink()
+
+    assert result.exit_code == 0
+    mock_run.assert_called_once_with(
+        "restore_config",
+        "router1",
+        {"backup_file": "backups/router1_20260101000000.cfg"},
+    )
+
+
+@patch("cli.commands.configure.run_playbook")
+def test_configure_restore_no_backups_found(mock_run):
+    result = runner.invoke(app, ["configure", "restore", "router1"])
+
+    assert result.exit_code != 0
+    mock_run.assert_not_called()

@@ -16,6 +16,9 @@ build/
 # ansible-runner artifacts
 artifacts/
 
+# config backups (host-specific runtime artifacts)
+backups/*.cfg
+
 # Cisco / network device images (too large for Git)
 *.iso
 *.qcow2
