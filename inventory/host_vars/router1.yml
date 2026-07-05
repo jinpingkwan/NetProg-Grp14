@@ -2,15 +2,20 @@
 # host_vars/router1.yml — Router 1 specific variables
 # =============================================================================
 
-# Management IP assigned by Containerlab (see netauto-lab.clab.yml)
+# Management IP assigned by Containerlab
 ansible_host: 172.20.20.11
 
-# Data-plane interfaces (used by playbooks for reference)
-# CSR1000v: GigabitEthernet1 = management, Gi2+ = data
+# Data-plane interfaces
 interfaces:
   GigabitEthernet2:
     description: "Link to router2 (backbone)"
     ipv4: "10.10.10.1/30"
+
   GigabitEthernet3:
     description: "LAN to server1"
     ipv4: "192.168.10.1/24"
+
+# Static routes used by playbooks/playbook.yml
+static_routes:
+  - dest: "192.168.20.0/24"
+    via: "10.10.10.2"

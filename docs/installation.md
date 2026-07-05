@@ -218,3 +218,37 @@ report `[ UP ]` with model/OS/version details. See
   tag doesn't match what `make docker-image` actually produced. Check
   `sudo docker images | grep csr` and make sure `lab/netauto-lab.clab.yml`
   points at the exact same tag (including the `vrnetlab/` prefix).
+
+## Running the test suite
+
+The project includes a pytest-based test suite for the CLI commands. The
+tests mock `run_playbook`, so no Containerlab topology, Docker containers,
+or network devices are required.
+
+Install the project dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run all tests:
+
+```bash
+pytest
+```
+
+For more detailed output:
+
+```bash
+pytest -v
+```
+
+To verify that the tests do not invoke Ansible directly, you can search the
+test directory:
+
+```bash
+grep -rn "ansible_runner" tests/
+```
+
+No matches should be returned because every test mocks
+`run_playbook()` rather than executing real playbooks.

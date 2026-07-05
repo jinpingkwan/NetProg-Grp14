@@ -1,71 +1,80 @@
 ---
 # =============================================================================
-# playbooks/playbook.yml — Device Configuration Playbook (Cisco CSR1000v Routers)
-# =============================================================================
-# Configures both routers with:
-#   - Interface IP addresses
-#   - Interface descriptions
-#   - User account
-#   - Banner (MOTD)
-#   - Static routes
-# Then retrieves and displays device information.
-#
-# Run:
-#   ansible-playbook playbooks/playbook.yml
+# playbooks/playbook.yml
+# Complete baseline configuration for Cisco IOS-XE routers
 # =============================================================================
 
-# ── Play 1: Configure Interface Descriptions ─────────────────────────────────
-- name: "Configure interface descriptions"
-  hosts: routers
+# -----------------------------------------------------------------------------
+# Play 1 - Configure Interface Descriptions
+# -----------------------------------------------------------------------------
+- name: Configure interface descriptions
+  hosts: "{{ target_host }}"
   gather_facts: false
+
   tasks:
 
-    - name: Set interface descriptions
+    - name: Configure interface descriptions
       cisco.ios.ios_interfaces:
         config:
           - name: GigabitEthernet2
             description: "{{ interfaces.GigabitEthernet2.description }}"
             enabled: true
+
           - name: GigabitEthernet3
             description: "{{ interfaces.GigabitEthernet3.description }}"
             enabled: true
+
         state: merged
 
-# ── Play 2: Configure Interface IP Addresses ─────────────────────────────────
-- name: "Configure interface IP addresses"
-  hosts: routers
+
+# -----------------------------------------------------------------------------
+# Play 2 - Configure Interface IP Addresses
+# -----------------------------------------------------------------------------
+- name: Configure interface IP addresses
+  hosts: "{{ target_host }}"
   gather_facts: false
+
   tasks:
 
-    - name: Set IP addresses on data interfaces
+    - name: Configure interface IPs
       cisco.ios.ios_l3_interfaces:
         config:
           - name: GigabitEthernet2
             ipv4:
               - address: "{{ interfaces.GigabitEthernet2.ipv4 }}"
+
           - name: GigabitEthernet3
             ipv4:
               - address: "{{ interfaces.GigabitEthernet3.ipv4 }}"
+
         state: merged
 
-# ── Play 3: Configure User Account ───────────────────────────────────────────
-- name: "Configure user account"
-  hosts: routers
+
+# -----------------------------------------------------------------------------
+# Play 3 - Configure User Account
+# -----------------------------------------------------------------------------
+- name: Configure user account
+  hosts: "{{ target_host }}"
   gather_facts: false
+
   tasks:
 
-    - name: Create netops user with privilege 15
+    - name: Create administrator account
       cisco.ios.ios_config:
         lines:
-          - username netops privilege 15 secret 0 netops123
+          - "username {{ new_username }} privilege 15 secret 0 {{ new_password }}"
 
-# ── Play 4: Configure Banner (MOTD) ──────────────────────────────────────────
-- name: "Configure banner message"
-  hosts: routers
+
+# -----------------------------------------------------------------------------
+# Play 4 - Configure Banner
+# -----------------------------------------------------------------------------
+- name: Configure login banner
+  hosts: "{{ target_host }}"
   gather_facts: false
+
   tasks:
 
-    - name: Set MOTD banner
+    - name: Configure MOTD banner
       cisco.ios.ios_banner:
         banner: motd
         text: |
@@ -76,43 +85,40 @@
           =========================================
         state: present
 
-# ── Play 5: Configure Static Routes ──────────────────────────────────────────
-- name: "Configure static routes"
-  hosts: routers
+
+# -----------------------------------------------------------------------------
+# Play 5 - Configure Static Routes
+# -----------------------------------------------------------------------------
+- name: Configure static routes
+  hosts: "{{ target_host }}"
   gather_facts: false
+
   tasks:
 
-    - name: Set static route on router1 (to server2 LAN via router2)
+    - name: Configure static routes
       cisco.ios.ios_static_routes:
         config:
           - address_families:
               - afi: ipv4
                 routes:
-                  - dest: 192.168.20.0/24
+                  - dest: "{{ item.dest }}"
                     next_hops:
-                      - forward_router_address: 10.10.10.2
+                      - forward_router_address: "{{ item.via }}"
         state: merged
-      when: inventory_hostname == "router1"
 
-    - name: Set static route on router2 (to server1 LAN via router1)
-      cisco.ios.ios_static_routes:
-        config:
-          - address_families:
-              - afi: ipv4
-                routes:
-                  - dest: 192.168.10.0/24
-                    next_hops:
-                      - forward_router_address: 10.10.10.1
-        state: merged
-      when: inventory_hostname == "router2"
+      loop: "{{ static_routes }}"
 
-# ── Play 6: Retrieve and Display Device Information ──────────────────────────
-- name: "Retrieve device information"
-  hosts: routers
+
+# -----------------------------------------------------------------------------
+# Play 6 - Retrieve Device Information
+# -----------------------------------------------------------------------------
+- name: Retrieve device information
+  hosts: "{{ target_host }}"
   gather_facts: false
+
   tasks:
 
-    - name: Gather device facts from routers
+    - name: Gather device facts
       cisco.ios.ios_facts:
         gather_subset:
           - default

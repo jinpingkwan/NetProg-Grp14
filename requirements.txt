@@ -1,8 +1,12 @@
 typer
+ansibletyper
 ansible
 ansible-runner
 rich
+
 # CSR1000v (IOS-XE 16.9) only offers SHA-1 based KEX (diffie-hellman-group14-sha1)
 # and ssh-rsa host keys over SSH. paramiko 4.0+ dropped both, so pin the last
 # release that still negotiates with it.
 paramiko<4
+
+pytest
