@@ -1,0 +1,39 @@
+# =============================================================================
+# playbooks/backup_config.yml — Backup Running Config
+# =============================================================================
+# Invoked by: netauto configure backup <host>
+# Required extra var: target_host (set automatically by cli/runner.py)
+#
+# Writes the router's running-config to a timestamped file on the CONTROL
+# NODE (not the router) at backups/<host>_<timestamp>.cfg.
+#
+# Usage (direct):
+#   ansible-playbook playbooks/backup_config.yml -e target_host=router1
+# =============================================================================
+---
+
+- name: Backup running configuration
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Gather running-config
+      cisco.ios.ios_command:
+        commands:
+          - show running-config
+      register: running_config
+
+    - name: Set backup file path
+      ansible.builtin.set_fact:
+        backup_path: "backups/{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}.cfg"
+
+    - name: Write running-config to control node
+      ansible.builtin.copy:
+        content: "{{ running_config.stdout[0] }}"
+        dest: "{{ playbook_dir }}/../{{ backup_path }}"
+      delegate_to: localhost
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: "✔ {{ inventory_hostname }}: running-config backed up to {{ backup_path }}"

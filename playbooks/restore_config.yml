@@ -1,0 +1,42 @@
+# =============================================================================
+# playbooks/restore_config.yml — Restore Config From Backup
+# =============================================================================
+# Invoked by: netauto configure restore <host> --file <path>
+# Required extra vars: target_host, backup_file (path under backups/)
+#
+# Pushes a previously captured backup file back to the router with
+# cisco.ios.ios_config, which diffs it against the running config and only
+# applies the delta (same idempotent behavior as the other configure_*
+# playbooks).
+#
+# Usage (direct):
+#   ansible-playbook playbooks/restore_config.yml \
+#     -e target_host=router1 -e backup_file=backups/router1_20260705120000.cfg
+# =============================================================================
+---
+
+- name: Restore configuration from backup
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+
+    - name: Check backup file exists on control node
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../{{ backup_file }}"
+      register: backup_stat
+      delegate_to: localhost
+      run_once: true
+
+    - name: Fail if backup file is missing
+      ansible.builtin.fail:
+        msg: "Backup file not found: {{ backup_file }}"
+      when: not backup_stat.stat.exists
+
+    - name: Push backup config
+      cisco.ios.ios_config:
+        src: "{{ playbook_dir }}/../{{ backup_file }}"
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: "✔ {{ inventory_hostname }}: configuration restored from {{ backup_file }}"

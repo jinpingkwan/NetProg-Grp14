@@ -1,4 +1,6 @@
+import glob
 import ipaddress
+from pathlib import Path
 from typing import Optional
 
 try:
@@ -8,7 +10,7 @@ except ImportError:
 
 import typer
 
-from cli.runner import run_playbook
+from cli.runner import PROJECT_ROOT, run_playbook
 
 app = typer.Typer(no_args_is_help=True, help="Configure a network device")
 
@@ -211,4 +213,45 @@ def add_route(
             "route_dest": dest,
             "route_gateway": via,
         },
+    )
+
+
+@app.command("backup")
+def backup(
+    host: Annotated[str, typer.Argument(help="Inventory hostname of the target device")],
+) -> None:
+    """Back up a device's running-config to the control node."""
+
+    run_playbook("backup_config", host, {})
+
+
+def _latest_backup(host: str) -> str:
+    candidates = sorted(glob.glob(str(PROJECT_ROOT / "backups" / f"{host}_*.cfg")))
+    if not candidates:
+        raise typer.BadParameter(
+            f"No backups found for '{host}' under backups/; run "
+            f"'netauto configure backup {host}' first or pass --file explicitly"
+        )
+    return str(Path(candidates[-1]).relative_to(PROJECT_ROOT))
+
+
+@app.command("restore")
+def restore(
+    host: Annotated[str, typer.Argument(help="Inventory hostname of the target device")],
+    file: Annotated[
+        Optional[str],
+        typer.Option(
+            "--file",
+            help="Path to a backup file under backups/; defaults to the most recent backup for this host",
+        ),
+    ] = None,
+) -> None:
+    """Restore a device's config from a previously captured backup."""
+
+    backup_file = file or _latest_backup(host)
+
+    run_playbook(
+        "restore_config",
+        host,
+        {"backup_file": backup_file},
     )
