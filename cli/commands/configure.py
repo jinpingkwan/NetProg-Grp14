@@ -81,19 +81,14 @@ def set_ip(
 
 @app.command("user")
 def create_user(
-    host: Annotated[str, typer.Argument(help="Inventory hostname of the target device")],
-    username: Annotated[str, typer.Option(help="Username to create")],
-    password: Annotated[
-        str,
-        typer.Option(
-            prompt=True,
-            hide_input=True,
-            confirmation_prompt=True,
-            help="Password for the new user",
-        ),
-    ] = "",
+    host: Annotated[str, typer.Argument()],
+    username: Annotated[str, typer.Option()],
+    password: Annotated[str, typer.Option(prompt=True, hide_input=True)] = "",
+    confirm_password: Annotated[str, typer.Option(prompt=True, hide_input=True)] = "",
 ) -> None:
-    """Create a user account on a network device."""
+
+    if password != confirm_password:
+        raise typer.Exit(code=1)
 
     run_playbook(
         "configure_user",
@@ -111,29 +106,14 @@ def create_user(
 
 @app.command("baseline")
 def configure_baseline(
-    host: Annotated[
-        str,
-        typer.Argument(help="Inventory hostname of the target device"),
-    ],
-    username: Annotated[
-        str,
-        typer.Option(help="Username to create"),
-    ],
-    password: Annotated[
-        str,
-        typer.Option(
-            prompt=True,
-            hide_input=True,
-            confirmation_prompt=True,
-            help="Password for the new user",
-        ),
-    ] = "",
+    host: Annotated[str, typer.Argument()],
+    username: Annotated[str, typer.Option()],
+    password: Annotated[str, typer.Option(prompt=True, hide_input=True)] = "",
+    confirm_password: Annotated[str, typer.Option(prompt=True, hide_input=True)] = "",
 ) -> None:
-    """
-    Configure a complete baseline on a freshly deployed router.
-    Applies interface configuration, user account, banner,
-    and static routes using playbook.yml.
-    """
+
+    if password != confirm_password:
+        raise typer.Exit(code=1)
 
     run_playbook(
         "playbook",
