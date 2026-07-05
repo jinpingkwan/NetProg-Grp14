@@ -1,11 +1,17 @@
 from unittest.mock import patch
 
-from cli.commands.info import device_info, system_info
+from typer.testing import CliRunner
+
+from cli.main import app
+
+runner = CliRunner()
 
 
 @patch("cli.commands.info.run_playbook")
 def test_device_info(mock_run):
-    device_info("router1")
+    result = runner.invoke(app, ["info", "device", "router1"])
+
+    assert result.exit_code == 0
 
     mock_run.assert_called_once_with(
         "info_device",
@@ -16,10 +22,31 @@ def test_device_info(mock_run):
 
 @patch("cli.commands.info.run_playbook")
 def test_system_info(mock_run):
-    system_info(
+    result = runner.invoke(app, ["info", "system", "server1"])
+
+    assert result.exit_code == 0
+
+    mock_run.assert_called_once_with(
+        "info_system",
         "server1",
-        host_ip="172.20.20.21",
+        {},
     )
+
+
+@patch("cli.commands.info.run_playbook")
+def test_system_info_override_host(mock_run):
+    result = runner.invoke(
+        app,
+        [
+            "info",
+            "system",
+            "server1",
+            "--host",
+            "172.20.20.21",
+        ],
+    )
+
+    assert result.exit_code == 0
 
     mock_run.assert_called_once_with(
         "info_system",
@@ -27,15 +54,4 @@ def test_system_info(mock_run):
         {
             "ansible_host": "172.20.20.21",
         },
-    )
-
-
-@patch("cli.commands.info.run_playbook")
-def test_system_info_without_host(mock_run):
-    system_info("server1")
-
-    mock_run.assert_called_once_with(
-        "info_system",
-        "server1",
-        {},
     )

@@ -1,17 +1,17 @@
 from unittest.mock import patch
 
-import typer
+from typer.testing import CliRunner
 
-from cli.commands.discover import discover
+from cli.main import app
 
-
-class DummyContext:
-    invoked_subcommand = None
+runner = CliRunner()
 
 
 @patch("cli.commands.discover.run_playbook")
 def test_discover(mock_run):
-    discover(DummyContext())
+    result = runner.invoke(app, ["discover"])
+
+    assert result.exit_code == 0
 
     mock_run.assert_called_once_with(
         "discover",
