@@ -1,5 +1,4 @@
 typer
-ansibletyper
 ansible
 ansible-runner
 rich

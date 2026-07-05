@@ -106,6 +106,75 @@ def test_configure_ip_rejects_bad_mask(mock_run):
 
 
 # ==========================================================
+# ROUTE CONFIGURATION TESTS
+# ==========================================================
+
+@patch("cli.commands.configure.run_playbook")
+def test_configure_route(mock_run):
+    result = runner.invoke(
+        app,
+        [
+            "configure",
+            "route",
+            "router1",
+            "--dest",
+            "10.0.0.0/24",
+            "--via",
+            "192.168.1.1",
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    mock_run.assert_called_once_with(
+        "configure_route",
+        "router1",
+        {
+            "route_dest": "10.0.0.0/24",
+            "route_gateway": "192.168.1.1",
+        },
+    )
+
+
+@patch("cli.commands.configure.run_playbook")
+def test_configure_route_rejects_bad_dest(mock_run):
+    result = runner.invoke(
+        app,
+        [
+            "configure",
+            "route",
+            "router1",
+            "--dest",
+            "not-a-network",
+            "--via",
+            "192.168.1.1",
+        ],
+    )
+
+    assert result.exit_code != 0
+    mock_run.assert_not_called()
+
+
+@patch("cli.commands.configure.run_playbook")
+def test_configure_route_rejects_bad_gateway(mock_run):
+    result = runner.invoke(
+        app,
+        [
+            "configure",
+            "route",
+            "router1",
+            "--dest",
+            "10.0.0.0/24",
+            "--via",
+            "not-an-ip",
+        ],
+    )
+
+    assert result.exit_code != 0
+    mock_run.assert_not_called()
+
+
+# ==========================================================
 # USER CONFIGURATION TESTS
 # ==========================================================
 
