@@ -49,6 +49,8 @@ CSR1000v / IOS-XE (see `inventory/group_vars/routers.yml`).
 | `netauto configure interface <host> --iface <name> --desc <text>` | `playbooks/configure_interface.yml` | `target_host`, `interface_name`, `interface_desc` |
 | `netauto configure route <host> --dest <cidr> --via <gateway>` | `playbooks/configure_route.yml` | `target_host`, `route_dest`, `route_gateway` |
 | **`netauto configure baseline <host> --username <name>`** | **`playbooks/playbook.yml`** | **`target_host`, `new_username`, `new_password`** |
+| `netauto configure backup <host>` | `playbooks/backup_config.yml` | `target_host` |
+| `netauto configure restore <host> [--file <path>]` | `playbooks/restore_config.yml` | `target_host`, `backup_file` |
 
 ### Baseline configuration
 
@@ -85,7 +87,24 @@ netauto configure interface router1 --iface GigabitEthernet3 --desc "Uplink"
 netauto configure route router1 --dest 10.0.0.0/24 --via 192.168.10.254
 
 netauto configure baseline router1 --username admin
+
+netauto configure backup router1
+
+netauto configure restore router1 --file backups/router1_20260705120000.cfg
+netauto configure restore router1   # restores the most recent backup for router1
 ```
+
+### Backup and restore
+
+`configure backup` snapshots a router's running-config to a timestamped file
+under `backups/` on the **control node** — a safety net to fall back on
+before a risky change. `configure restore` pushes a captured backup back;
+`ios_config` diffs it against the running config and only applies the delta,
+so restoring an already-current config is a no-op.
+
+If `--file` is omitted, `restore` defaults to the most recent
+`backups/<host>_*.cfg` file on disk for that host. A nonexistent `--file`
+path fails with a clear error rather than a raw Ansible traceback.
 
 ---
 
